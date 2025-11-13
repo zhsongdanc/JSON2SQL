@@ -1,14 +1,10 @@
 package com.zhsong.sql;
 
 import com.zhsong.sql.controller.TestController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Controller;
 
 /*
  * @Author: demussong
@@ -16,7 +12,7 @@ import org.springframework.stereotype.Controller;
  * @Date: 2023/9/5 13:45
  */
 @SpringBootApplication
-@ComponentScan("com.zhsong.sql.controller")
+@ComponentScan("com.zhsong.sql")
 public class Json2SqlApplication {
 
 
