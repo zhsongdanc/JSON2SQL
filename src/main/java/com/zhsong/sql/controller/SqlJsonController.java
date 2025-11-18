@@ -1,5 +1,6 @@
 package com.zhsong.sql.controller;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.zhsong.sql.dto.SqlJsonDto;
 import com.zhsong.sql.service.SqlJsonConverterService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,15 @@ public class SqlJsonController {
      * }
      */
     @PostMapping("/sql-to-json")
-    public SqlJsonDto sqlToJson(@RequestBody SqlToJsonRequest request) {
-        return converterService.sqlToJson(request.getSql(), request.getDbType());
+    public String sqlToJson(@RequestBody SqlToJsonRequest request) {
+        SqlJsonDto sqlJsonDto = null;
+        try {
+            sqlJsonDto = converterService.sqlToJson(request.getSql(), request.getDbType());
+            return JSONUtils.toJSONString(sqlJsonDto);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "error";
     }
     
     /**

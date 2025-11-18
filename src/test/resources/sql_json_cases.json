@@ -1,0 +1,536 @@
+[
+  {
+    "id": "select_basic_eq",
+    "description": "基础SELECT，含别名与简单WHERE条件",
+    "dbType": "mysql",
+    "sql": "SELECT u.id, u.name FROM users u WHERE u.status = 'ACTIVE'",
+    "json": {
+      "type": "SELECT",
+      "select": {
+        "selectList": [
+          {
+            "expr": {
+              "type": "IDENTIFIER",
+              "name": "u.id"
+            }
+          },
+          {
+            "expr": {
+              "type": "IDENTIFIER",
+              "name": "u.name"
+            }
+          }
+        ],
+        "from": {
+          "type": "TABLE",
+          "table": "users",
+          "alias": "u"
+        },
+        "where": {
+          "type": "BINARY_OP",
+          "operator": "=",
+          "left": {
+            "type": "IDENTIFIER",
+            "name": "u.status"
+          },
+          "right": {
+            "type": "LITERAL",
+            "literalType": "STRING",
+            "value": "ACTIVE"
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "select_join_group",
+    "description": "多表JOIN + GROUP BY + HAVING + ORDER BY + LIMIT",
+    "dbType": "mysql",
+    "sql": "SELECT o.id, o.total_amount, u.name AS customer_name FROM orders o INNER JOIN users u ON o.user_id = u.id WHERE o.created_at >= '2024-01-01' GROUP BY o.id, o.total_amount, u.name HAVING SUM(o.total_amount) > 100 ORDER BY o.created_at DESC LIMIT 10",
+    "json": {
+      "type": "SELECT",
+      "select": {
+        "selectList": [
+          {
+            "expr": {
+              "type": "IDENTIFIER",
+              "name": "o.id"
+            }
+          },
+          {
+            "expr": {
+              "type": "IDENTIFIER",
+              "name": "o.total_amount"
+            }
+          },
+          {
+            "expr": {
+              "type": "IDENTIFIER",
+              "name": "u.name"
+            },
+            "alias": "customer_name"
+          }
+        ],
+        "from": {
+          "type": "JOIN",
+          "joinType": "INNER",
+          "left": {
+            "type": "TABLE",
+            "table": "orders",
+            "alias": "o"
+          },
+          "right": {
+            "type": "TABLE",
+            "table": "users",
+            "alias": "u"
+          },
+          "condition": {
+            "type": "BINARY_OP",
+            "operator": "=",
+            "left": {
+              "type": "IDENTIFIER",
+              "name": "o.user_id"
+            },
+            "right": {
+              "type": "IDENTIFIER",
+              "name": "u.id"
+            }
+          }
+        },
+        "where": {
+          "type": "BINARY_OP",
+          "operator": ">=",
+          "left": {
+            "type": "IDENTIFIER",
+            "name": "o.created_at"
+          },
+          "right": {
+            "type": "LITERAL",
+            "literalType": "STRING",
+            "value": "2024-01-01"
+          }
+        },
+        "groupBy": {
+          "items": [
+            {
+              "type": "IDENTIFIER",
+              "name": "o.id"
+            },
+            {
+              "type": "IDENTIFIER",
+              "name": "o.total_amount"
+            },
+            {
+              "type": "IDENTIFIER",
+              "name": "u.name"
+            }
+          ]
+        },
+        "having": {
+          "type": "BINARY_OP",
+          "operator": ">",
+          "left": {
+            "type": "FUNCTION",
+            "functionName": "SUM",
+            "arguments": [
+              {
+                "type": "IDENTIFIER",
+                "name": "o.total_amount"
+              }
+            ]
+          },
+          "right": {
+            "type": "LITERAL",
+            "literalType": "NUMBER",
+            "value": 100
+          }
+        },
+        "orderBy": {
+          "items": [
+            {
+              "expr": {
+                "type": "IDENTIFIER",
+                "name": "o.created_at"
+              },
+              "direction": "DESC"
+            }
+          ]
+        },
+        "limit": {
+          "offset": 0,
+          "rowCount": 10
+        }
+      }
+    }
+  },
+  {
+    "id": "insert_multi_rows",
+    "description": "INSERT多行写入示例",
+    "dbType": "mysql",
+    "sql": "INSERT INTO orders (id, user_id, total_amount) VALUES (1, 101, 99.9), (2, 102, 215.5)",
+    "json": {
+      "type": "INSERT",
+      "insert": {
+        "table": "orders",
+        "columns": [
+          "id",
+          "user_id",
+          "total_amount"
+        ],
+        "values": [
+          [
+            {
+              "type": "LITERAL",
+              "literalType": "NUMBER",
+              "value": 1
+            },
+            {
+              "type": "LITERAL",
+              "literalType": "NUMBER",
+              "value": 101
+            },
+            {
+              "type": "LITERAL",
+              "literalType": "NUMBER",
+              "value": 99.9
+            }
+          ],
+          [
+            {
+              "type": "LITERAL",
+              "literalType": "NUMBER",
+              "value": 2
+            },
+            {
+              "type": "LITERAL",
+              "literalType": "NUMBER",
+              "value": 102
+            },
+            {
+              "type": "LITERAL",
+              "literalType": "NUMBER",
+              "value": 215.5
+            }
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "id": "update_with_params",
+    "description": "UPDATE语句，包含绑定参数和复杂WHERE",
+    "dbType": "mysql",
+    "sql": "UPDATE users SET last_login = NOW(), status = :status WHERE id = :id AND deleted = 0",
+    "json": {
+      "type": "UPDATE",
+      "update": {
+        "table": "users",
+        "set": {
+          "last_login": {
+            "type": "FUNCTION",
+            "functionName": "NOW",
+            "arguments": []
+          },
+          "status": {
+            "type": "PARAMETER",
+            "parameterName": ":status"
+          }
+        },
+        "where": {
+          "type": "BINARY_OP",
+          "operator": "AND",
+          "left": {
+            "type": "BINARY_OP",
+            "operator": "=",
+            "left": {
+              "type": "IDENTIFIER",
+              "name": "id"
+            },
+            "right": {
+              "type": "PARAMETER",
+              "parameterName": ":id"
+            }
+          },
+          "right": {
+            "type": "BINARY_OP",
+            "operator": "=",
+            "left": {
+              "type": "IDENTIFIER",
+              "name": "deleted"
+            },
+            "right": {
+              "type": "LITERAL",
+              "literalType": "NUMBER",
+              "value": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "delete_exists_subquery",
+    "description": "DELETE语句，包含EXISTS子查询",
+    "dbType": "mysql",
+    "sql": "DELETE FROM sessions s WHERE EXISTS (SELECT 1 FROM users u WHERE u.id = s.user_id AND u.status = 'BANNED')",
+    "json": {
+      "type": "DELETE",
+      "delete": {
+        "table": "sessions",
+        "where": {
+          "type": "EXISTS",
+          "existsQuery": {
+            "type": "SELECT",
+            "select": {
+              "selectList": [
+                {
+                  "expr": {
+                    "type": "LITERAL",
+                    "literalType": "NUMBER",
+                    "value": 1
+                  }
+                }
+              ],
+              "from": {
+                "type": "TABLE",
+                "table": "users",
+                "alias": "u"
+              },
+              "where": {
+                "type": "BINARY_OP",
+                "operator": "AND",
+                "left": {
+                  "type": "BINARY_OP",
+                  "operator": "=",
+                  "left": {
+                    "type": "IDENTIFIER",
+                    "name": "u.id"
+                  },
+                  "right": {
+                    "type": "IDENTIFIER",
+                    "name": "s.user_id"
+                  }
+                },
+                "right": {
+                  "type": "BINARY_OP",
+                  "operator": "=",
+                  "left": {
+                    "type": "IDENTIFIER",
+                    "name": "u.status"
+                  },
+                  "right": {
+                    "type": "LITERAL",
+                    "literalType": "STRING",
+                    "value": "BANNED"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "id": "cte_union_example",
+    "description": "WITH CTE + UNION ALL示例，演示复杂SELECT",
+    "dbType": "oracle",
+    "sql": "WITH active_users AS (SELECT id, name FROM users WHERE status = 'ACTIVE'), recent_orders AS (SELECT user_id, COUNT(*) AS order_count FROM orders WHERE created_at >= SYSDATE - 30 GROUP BY user_id) SELECT au.id, au.name, ro.order_count FROM active_users au LEFT JOIN recent_orders ro ON au.id = ro.user_id UNION ALL SELECT u.id, u.name, 0 FROM users u WHERE u.status = 'INACTIVE'",
+    "json": {
+      "type": "SELECT",
+      "select": {
+        "with": [
+          {
+            "name": "active_users",
+            "query": {
+              "selectList": [
+                {
+                  "expr": {
+                    "type": "IDENTIFIER",
+                    "name": "id"
+                  }
+                },
+                {
+                  "expr": {
+                    "type": "IDENTIFIER",
+                    "name": "name"
+                  }
+                }
+              ],
+              "from": {
+                "type": "TABLE",
+                "table": "users"
+              },
+              "where": {
+                "type": "BINARY_OP",
+                "operator": "=",
+                "left": {
+                  "type": "IDENTIFIER",
+                  "name": "status"
+                },
+                "right": {
+                  "type": "LITERAL",
+                  "literalType": "STRING",
+                  "value": "ACTIVE"
+                }
+              }
+            }
+          },
+          {
+            "name": "recent_orders",
+            "query": {
+              "selectList": [
+                {
+                  "expr": {
+                    "type": "IDENTIFIER",
+                    "name": "user_id"
+                  }
+                },
+                {
+                  "expr": {
+                    "type": "FUNCTION",
+                    "functionName": "COUNT",
+                    "arguments": [
+                      {
+                        "type": "LITERAL",
+                        "literalType": "NUMBER",
+                        "value": 1
+                      }
+                    ]
+                  },
+                  "alias": "order_count"
+                }
+              ],
+              "from": {
+                "type": "TABLE",
+                "table": "orders"
+              },
+              "where": {
+                "type": "BINARY_OP",
+                "operator": ">=",
+                "left": {
+                  "type": "IDENTIFIER",
+                  "name": "created_at"
+                },
+                "right": {
+                  "type": "BINARY_OP",
+                  "operator": "-",
+                  "left": {
+                    "type": "FUNCTION",
+                    "functionName": "SYSDATE",
+                    "arguments": []
+                  },
+                  "right": {
+                    "type": "LITERAL",
+                    "literalType": "NUMBER",
+                    "value": 30
+                  }
+                }
+              },
+              "groupBy": {
+                "items": [
+                  {
+                    "type": "IDENTIFIER",
+                    "name": "user_id"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "selectList": [
+          {
+            "expr": {
+              "type": "IDENTIFIER",
+              "name": "au.id"
+            }
+          },
+          {
+            "expr": {
+              "type": "IDENTIFIER",
+              "name": "au.name"
+            }
+          },
+          {
+            "expr": {
+              "type": "IDENTIFIER",
+              "name": "ro.order_count"
+            }
+          }
+        ],
+        "from": {
+          "type": "JOIN",
+          "joinType": "LEFT",
+          "left": {
+            "type": "TABLE",
+            "table": "active_users",
+            "alias": "au"
+          },
+          "right": {
+            "type": "TABLE",
+            "table": "recent_orders",
+            "alias": "ro"
+          },
+          "condition": {
+            "type": "BINARY_OP",
+            "operator": "=",
+            "left": {
+              "type": "IDENTIFIER",
+              "name": "au.id"
+            },
+            "right": {
+              "type": "IDENTIFIER",
+              "name": "ro.user_id"
+            }
+          }
+        },
+        "unionType": "UNION_ALL",
+        "union": [
+          {
+            "selectList": [
+              {
+                "expr": {
+                  "type": "IDENTIFIER",
+                  "name": "u.id"
+                }
+              },
+              {
+                "expr": {
+                  "type": "IDENTIFIER",
+                  "name": "u.name"
+                }
+              },
+              {
+                "expr": {
+                  "type": "LITERAL",
+                  "literalType": "NUMBER",
+                  "value": 0
+                }
+              }
+            ],
+            "from": {
+              "type": "TABLE",
+              "table": "users",
+              "alias": "u"
+            },
+            "where": {
+              "type": "BINARY_OP",
+              "operator": "=",
+              "left": {
+                "type": "IDENTIFIER",
+                "name": "u.status"
+              },
+              "right": {
+                "type": "LITERAL",
+                "literalType": "STRING",
+                "value": "INACTIVE"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+]
+
+
