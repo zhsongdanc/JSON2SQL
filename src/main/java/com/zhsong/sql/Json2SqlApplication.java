@@ -12,7 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
  * @Date: 2023/9/5 13:45
  */
 @SpringBootApplication
-@ComponentScan("com.zhsong.sql")
 public class Json2SqlApplication {
 
 
